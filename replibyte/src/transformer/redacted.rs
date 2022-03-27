@@ -106,7 +106,7 @@ mod tests {
             "github",
             "users",
             "credit_card_number",
-            &RedactedTransformerOptions::default(),
+            &RedactedTransformerOptions { char: '*' },
         )
     }
 }
