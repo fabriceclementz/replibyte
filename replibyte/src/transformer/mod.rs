@@ -11,6 +11,7 @@ pub mod first_name;
 pub mod keep_first_char;
 pub mod phone_number;
 pub mod random;
+pub mod redacted;
 pub mod transient;
 
 pub fn transformers() -> Vec<Box<dyn Transformer>> {

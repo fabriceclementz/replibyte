@@ -3,6 +3,7 @@ use crate::transformer::first_name::FirstNameTransformer;
 use crate::transformer::keep_first_char::KeepFirstCharTransformer;
 use crate::transformer::phone_number::PhoneNumberTransformer;
 use crate::transformer::random::RandomTransformer;
+use crate::transformer::redacted::{RedactedTransformer, RedactedTransformerOptions};
 use crate::transformer::Transformer;
 use serde;
 use serde::{Deserialize, Serialize};
@@ -150,19 +151,16 @@ pub struct ColumnConfig {
 }
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[serde(tag = "name", rename_all = "kebab-case")]
+#[serde(content = "options")]
 pub enum TransformerTypeConfig {
-    #[serde(rename = "random")]
     Random,
-    #[serde(rename = "random-date")]
     RandomDate,
-    #[serde(rename = "first-name")]
     FirstName,
-    #[serde(rename = "email")]
     Email,
-    #[serde(rename = "keep-first-char")]
     KeepFirstChar,
-    #[serde(rename = "phone-number")]
     PhoneNumber,
+    Redacted(RedactedTransformerOptions),
 }
 
 impl TransformerTypeConfig {
@@ -171,7 +169,7 @@ impl TransformerTypeConfig {
         database_name: &str,
         table_name: &str,
         column_name: &str,
-    ) -> Box<dyn Transformer> {
+    ) -> Box<dyn Transformer + '_> {
         let transformer: Box<dyn Transformer> = match self {
             TransformerTypeConfig::Random => Box::new(RandomTransformer::new(
                 database_name,
@@ -199,6 +197,12 @@ impl TransformerTypeConfig {
                 column_name,
             )),
             TransformerTypeConfig::RandomDate => todo!(),
+            TransformerTypeConfig::Redacted(options) => Box::new(RedactedTransformer::new(
+                database_name,
+                table_name,
+                column_name,
+                options,
+            )),
         };
 
         transformer

@@ -1,0 +1,21 @@
+source:
+  connection_uri: postgres://root:password@localhost:5432/root
+  transformers:
+    - database: public
+      table: employees
+      columns:
+        - name: first_name
+          transformer:
+            name: first-name
+        - name: last_name
+          transformer:
+            name: redacted
+            options:
+              char: '#'
+bridge:
+  bucket: replibyte-test
+  region: us-east-2
+  access_key_id: minioadmin
+  secret_access_key: minioadmin
+  endpoint:
+    custom: 'http://localhost:9000'
