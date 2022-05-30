@@ -252,7 +252,7 @@ impl Datastore for LocalDisk {
 
 #[cfg(test)]
 mod tests {
-    use std::{fs::OpenOptions, path::Path};
+    use std::{fs::OpenOptions, path::Path, thread, time};
 
     use chrono::{Duration, Utc};
     use serde_json::json;
@@ -430,12 +430,16 @@ mod tests {
         assert_eq!(local_disk.index_file().unwrap().dumps.len(), 1);
         assert!(Path::new(&format!("{}/dump-1", dir.path().to_str().unwrap())).exists());
 
+        thread::sleep(time::Duration::from_millis(1000));
+
         // create dump 2
         local_disk.set_dump_name("dump-2".to_string());
         let bytes: Vec<u8> = b"hello world from dump-2".to_vec();
         assert!(local_disk.write(1, bytes).is_ok());
         assert_eq!(local_disk.index_file().unwrap().dumps.len(), 2);
         assert!(Path::new(&format!("{}/dump-2", dir.path().to_str().unwrap())).exists());
+
+        thread::sleep(time::Duration::from_millis(1000));
 
         // create dump 3
         local_disk.set_dump_name("dump-3".to_string());
